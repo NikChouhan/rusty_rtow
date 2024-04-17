@@ -1,14 +1,14 @@
 use super::vec::Vec3;
 use super::vec::Point3;
 
-struct Ray {
+pub struct Ray {
     orig: Point3,
     dir: Vec3
 }
 
 impl Ray {
     pub fn new(origin: Point3, direction: Vec3) -> Ray {
-        Ray {origin, direction}
+        Ray {orig: origin,dir: direction}
     }
 
     pub fn direction(&self) -> Vec3 {
