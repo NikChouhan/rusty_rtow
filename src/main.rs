@@ -1,5 +1,7 @@
 mod vec;
 mod ray;
+mod sphere;
+mod hit;
 
 use std::{fs::File, io::{BufWriter, Write}};
 use vec::{Vec3, Point3, Color};
@@ -8,15 +10,15 @@ use ray::Ray;
 fn hit_sphere(center: &Point3, radius: f64, r: &Ray) -> f64 {
     let oc = *center - r.origin();
     let a = r.direction().dot(r.direction());
-    let b = -2.0 * r.direction().dot(oc);
+    let half_b = r.direction().dot(oc);
     let c = oc.dot(oc) - radius*radius;
-    let discriminant = b*b - 4.0*a*c;
+    let discriminant = half_b*half_b - a*c;
 
     if discriminant < 0.0 {
         return -1.0;
     }
     else {
-        return (-b - f64::sqrt(discriminant)) / (2.0 *a);
+        return (half_b - f64::sqrt(discriminant)) / a;
     }
 }
 
@@ -50,7 +52,7 @@ fn main(){
     let width_ratio = VIEWPORT_WIDTH/(IMAGE_WIDTH as f64);
     let height_ratio = VIEWPORT_HEIGHT/(IMAGE_HEIGHT as f64);
 
-    let botom_left_corner = camera_center - Vec3::new(VIEWPORT_WIDTH/2.0, VIEWPORT_HEIGHT/2.0, focal_length);
+    let bottom_left_corner = camera_center - Vec3::new(VIEWPORT_WIDTH/2.0, VIEWPORT_HEIGHT/2.0, focal_length);
 
 
     let file = File::create("image.ppm").expect("unable to create file");
@@ -62,7 +64,7 @@ fn main(){
 
     for j in 0..IMAGE_HEIGHT {
         for i in 0..IMAGE_WIDTH {
-            let dir = botom_left_corner +Vec3::new(width_ratio*(i as f64), height_ratio*(j as f64), 0.0);
+            let dir = bottom_left_corner +Vec3::new(width_ratio*(i as f64), height_ratio*(j as f64), 0.0);
             let r = Ray::new(camera_center, dir);
 
             let pixel_color = ray_color(&r);
