@@ -50,10 +50,10 @@ impl Vec3 {
         self / self.length()
     }
 
-    pub fn format_color(self) -> String {
-        format!("{} {} {}", (255.999 * self[0]) as u64,
-                            (255.999 * self[1]) as u64,
-                            (255.999 * self[2]) as u64)
+    pub fn format_color(self, samples_per_pixel: u64) -> String {
+        format!("{} {} {}", (255.999 * (self[0] / (samples_per_pixel as f64)).clamp(0.0, 0.999)) as u64,
+                            (255.999 * (self[1] / (samples_per_pixel as f64)).clamp(0.0, 0.999)) as u64,
+                            (255.999 * (self[2] / (samples_per_pixel as f64)).clamp(0.0, 0.999)) as u64)
     }
 
 

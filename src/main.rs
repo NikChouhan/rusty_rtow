@@ -2,12 +2,15 @@ mod vec;
 mod ray;
 mod sphere;
 mod hit;
+mod camera;
 
 use std::{fs::File, io::{BufWriter, Write}};
+use rand::Rng;
 use vec::{Vec3, Point3, Color};
 use ray::Ray;
 use hit::{Hit,World};
 use sphere::Sphere;
+use camera::Camera;
 
 
 fn ray_color(r: &Ray, world: &World) -> Color {
@@ -28,6 +31,8 @@ fn main(){
     const IMAGE_WIDTH : u64 = 400;
     const IMAGE_HEIGHT : u64 = (IMAGE_WIDTH as f64/ASPECT_RATIO) as u64;
 
+    const SAMPLES_PER_PIXEL: u64 = 100;
+
     //World
 
     let mut world = World::new();
@@ -35,17 +40,8 @@ fn main(){
     world.push(Box::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0)));
 
     //Camera
-
-    const VIEWPORT_HEIGHT : f64 = 2.0;
-    const VIEWPORT_WIDTH : f64 = VIEWPORT_HEIGHT * ((IMAGE_WIDTH/IMAGE_HEIGHT) as f64);
-    let camera_center  = Point3::new(0.0, 0.0, 0.0);
-    let focal_length = 1.0;
-    
-    let width_ratio = VIEWPORT_WIDTH/((IMAGE_WIDTH-1) as f64);
-    let height_ratio = VIEWPORT_HEIGHT/((IMAGE_HEIGHT-1) as f64);
-
-    let bottom_left_corner = camera_center - Vec3::new(VIEWPORT_WIDTH/2.0, VIEWPORT_HEIGHT/2.0, focal_length);
-
+    let cam = Camera::new();
+    let mut rng = rand::thread_rng();
 
     let file = File::create("image.ppm").expect("unable to create file");
     //Render
@@ -56,12 +52,17 @@ fn main(){
 
     for j in (0..IMAGE_HEIGHT).rev() {
         for i in 0..IMAGE_WIDTH {
-            let dir = bottom_left_corner +Vec3::new(width_ratio*(i as f64), height_ratio*(j as f64), 0.0);
-            let r = Ray::new(camera_center, dir);
+            let mut pixel_color = Color::new(0.0, 0.0, 0.0);
+            for _ in 0..SAMPLES_PER_PIXEL {
+                let random_u: f64 = rng.gen();
+                let random_v: f64 = rng.gen();
+                let u = i as f64 + random_u;
+                let v = j as f64 + random_v;
+                let r = cam.get_ray(u,v);
 
-            let pixel_color = ray_color(&r, &world);
-
-            write!(file, "{} \n", pixel_color.format_color()).expect("Error in writing to the last line");
+                pixel_color += ray_color(&r, &world);
+            }
+            write!(file, "{} \n", pixel_color.format_color(SAMPLES_PER_PIXEL)).expect("Error in writing to the last line");
             
         }
     }  
