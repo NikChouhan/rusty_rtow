@@ -16,7 +16,7 @@ impl Sphere {
 
 impl Hit for Sphere {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
-        let oc = r.origin() - self.center;
+        let oc = r.origin() - self.center;      //because oc is vector from center to origin half_b formula is used as it is, else half_b would be replaced by -half_b
         let a = r.direction().dot(r.direction());
         let half_b = oc.dot(r.direction());
         let c = oc.length().powi(2) - self.radius.powi(2);
