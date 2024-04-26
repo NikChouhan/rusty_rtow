@@ -13,17 +13,6 @@ use sphere::Sphere;
 use camera::Camera;
 
 
-fn ray_color(r: &Ray, world: &World) -> Color {
-
-    if let Some(rec) = world.hit(r, 0.0, f64::INFINITY) {
-        0.5*(rec.normal + Color::new(1.0, 1.0, 1.0))
-    }
-    else {
-        let t = 0.5 * (r.direction().normalised().y() +1.0);
-        let color : Color = (1.0-t) * Color::new(1.0, 1.0, 1.0) + (t)*Color::new(0.5, 0.7, 1.0);
-        return color;
-    }
-}
 fn main(){ 
 
     //Image
@@ -60,7 +49,7 @@ fn main(){
                 let v = j as f64 + random_v;
                 let r = cam.get_ray(u,v);
 
-                pixel_color += ray_color(&r, &world);
+                pixel_color += Camera::ray_color(&r, &world);
             }
             write!(file, "{} \n", pixel_color.format_color(SAMPLES_PER_PIXEL)).expect("Error in writing to the last line");
             

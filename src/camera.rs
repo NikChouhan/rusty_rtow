@@ -1,5 +1,7 @@
-use super::vec::{Vec3, Point3};
+use super::vec::{Vec3, Point3, Color};
 use super::ray::Ray;
+
+use super::hit::{Hit, World};
 
 pub struct Camera {
     pub origin: Point3,
@@ -7,6 +9,8 @@ pub struct Camera {
     pub width_ratio: f64,
     pub height_ratio: f64
 }
+
+
 
 impl Camera {
     pub fn new() -> Camera {
@@ -34,8 +38,18 @@ impl Camera {
     }
 
 
+    pub fn ray_color(r: &Ray, world: &World) -> Color {
+
+        if let Some(rec) = world.hit(r, 0.0, f64::INFINITY) {
+            return 0.5*(rec.normal + Color::new(1.0, 1.0, 1.0));
+        }
+        else {
+            let t = 0.5 * (r.direction().normalised().y() +1.0);
+            let color : Color = (1.0-t) * Color::new(1.0, 1.0, 1.0) + (t)*Color::new(0.5, 0.7, 1.0);
+            return color;
+        }
+    }
     pub fn get_ray(&self, u: f64,v: f64 ) -> Ray {
-        Ray::new(self.origin,self.bottom_left_corner +Vec3::new(self.width_ratio*u, self.height_ratio *v, 0.0)
-)
+        Ray::new(self.origin,self.bottom_left_corner +Vec3::new(self.width_ratio*u, self.height_ratio *v, 0.0))
     }
 }
