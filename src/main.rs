@@ -7,8 +7,7 @@ mod camera;
 use std::{fs::File, io::{BufWriter, Write}};
 use rand::Rng;
 use vec::{Vec3, Point3, Color};
-use ray::Ray;
-use hit::{Hit,World};
+use hit::World;
 use sphere::Sphere;
 use camera::Camera;
 
